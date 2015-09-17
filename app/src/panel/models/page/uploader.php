@@ -1,4 +1,4 @@
-<?php 
+<?php
 
 namespace Kirby\Panel\Models\Page;
 
@@ -23,12 +23,16 @@ class Uploader {
     if($this->file) {
       $this->replace();
     } else {
-      $this->upload();      
+      $this->upload();
     }
 
   }
 
   public function upload() {
+
+    if(!panel()->user()->hasPermission('panel.file.upload', $this->page)) {
+      throw new Exception('You are not allowed to upload a file to this page');
+    }
 
     $upload = new Upload($this->page->root() . DS . $this->filename, array(
       'overwrite' => true,
@@ -47,11 +51,15 @@ class Uploader {
 
     $file = $this->move($upload);
 
-    kirby()->trigger('panel.file.upload', $file);          
+    kirby()->trigger('panel.file.upload', $file);
 
   }
 
   public function replace() {
+
+    if(!panel()->user()->hasPermission('panel.file.replace', $this->page)) {
+      throw new Exception('You are not allowed to replace a file of this page');
+    }
 
     $file   = $this->file;
     $upload = new Upload($file->root(), array(
@@ -121,7 +129,7 @@ class Uploader {
     if(in_array(strtolower($file->mime()), $forbiddenMimes)) {
       throw new Exception('Forbidden mime type');
     }
-    
+
     // Block htaccess files
     if(strtolower($file->filename()) == '.htaccess') {
       throw new Exception('htaccess files cannot be uploaded');
@@ -137,7 +145,7 @@ class Uploader {
       throw new Exception('Page only allows: ' . implode(', ', $filesettings->type()));
     }
 
-    // Files blueprint option 'size' 
+    // Files blueprint option 'size'
     if($filesettings->size() and f::size($file->root()) > $filesettings->size()) {
       throw new Exception('Page only allows file size of ' . f::niceSize($filesettings->size()));
     }
@@ -150,7 +158,7 @@ class Uploader {
     // Files blueprint option 'height'
     if($file->type() == 'image' and $filesettings->height() and $file->height() > $filesettings->height()) {
       throw new Exception('Page only allows image height of ' . $filesettings->height().'px');
-    } 
+    }
 
   }
 

@@ -12,17 +12,17 @@ class File extends \File {
     if(empty($action)) {
       return parent::url();
     } else if($action == 'preview') {
-      return parent::url() . '?' . $this->modified();    
+      return parent::url() . '?' . $this->modified();
     } else {
-      return $this->page()->url('file') . '/' . rawurlencode($this->filename()) . '/' . $action;      
+      return $this->page()->url('file') . '/' . rawurlencode($this->filename()) . '/' . $action;
     }
   }
 
   public function menu() {
-    return new Menu($this);    
+    return new Menu($this);
   }
 
-  public function form($action, $callback) {    
+  public function form($action, $callback) {
     return panel()->form('files/' . $action, $this, $callback);
   }
 
@@ -41,13 +41,13 @@ class File extends \File {
   }
 
   public function getFormData() {
-    return $this->meta()->toArray();    
+    return $this->meta()->toArray();
   }
 
   public function canHavePreview() {
     $images = array('image/jpeg', 'image/gif', 'image/png');
-    return (in_array($this->mime(), $images) or $this->extension() == 'svg');    
-  }  
+    return (in_array($this->mime(), $images) or $this->extension() == 'svg');
+  }
 
   public function canHaveThumb() {
     if(!$this->canHavePreview()) {
@@ -59,23 +59,27 @@ class File extends \File {
         return true;
       }
     } else {
-      return true;      
+      return true;
     }
   }
 
   public function rename($name) {
 
+    if(!panel()->user()->hasPermission('panel.file.update', $this->page)) {
+      throw new Exception('You are not allowed to rename this file');
+    }
+
     if($name == $this->name()) return true;
 
-    // rename and get the new filename          
+    // rename and get the new filename
     $filename = parent::rename($name);
 
     // trigger the rename hook
-    kirby()->trigger('panel.file.rename', $this);          
+    kirby()->trigger('panel.file.rename', $this);
 
   }
 
-  public function update($input = array(), $sort = null) {  
+  public function update($input = array(), $sort = null) {
 
     if($input == 'sort') {
       parent::update(array('sort' => $sort));
@@ -87,7 +91,7 @@ class File extends \File {
 
     // rename the file if necessary
     if(!empty($data['_name'])) {
-      $filename = $this->rename($data['_name']);      
+      $filename = $this->rename($data['_name']);
     }
 
     // remove the name url and info
@@ -96,7 +100,7 @@ class File extends \File {
     unset($data['_link']);
 
     if(!empty($data)) {
-      parent::update($data);          
+      parent::update($data);
     }
 
     kirby()->trigger('panel.file.update', $this);
@@ -104,12 +108,20 @@ class File extends \File {
   }
 
   public function replace() {
-    new Uploader($this->page, $this);    
+    if(!panel()->user()->hasPermission('panel.file.replace', $this->page)) {
+      throw new Exception('You are not allowed to replace this file');
+    }
+
+    new Uploader($this->page, $this);
   }
 
   public function delete() {
+    if(!panel()->user()->hasPermission('panel.file.delete', $this->page)) {
+      throw new Exception('You are not allowed to delete this file');
+    }
+
     parent::delete();
-    kirby()->trigger('panel.file.delete', $this);    
+    kirby()->trigger('panel.file.delete', $this);
   }
 
   public function thumb() {
@@ -164,7 +176,7 @@ class File extends \File {
         default:
           return '[' . $this->filename() . '](' . parent::url() . ')';
           break;
-      }    
+      }
     } else {
       switch($this->type()) {
         case 'image':
@@ -182,7 +194,7 @@ class File extends \File {
     $this->files()->topbar($topbar);
 
     $topbar->append($this->url(), $this->filename());
-   
+
   }
 
 }

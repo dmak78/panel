@@ -22,7 +22,7 @@ load(array(
   // controllers
   'kirby\\panel\\controllers\\base'               => 'panel' . DS . 'controllers' . DS . 'base.php',
   'kirby\\panel\\controllers\\field'              => 'panel' . DS . 'controllers' . DS . 'field.php',
-  
+
   // form
   'kirby\\panel\\form'                            => 'panel' . DS . 'form.php',
   'kirby\\panel\\form\\fieldoptions'              => 'panel' . DS . 'form' . DS . 'fieldoptions.php',
@@ -46,12 +46,13 @@ load(array(
   'kirby\\panel\\models\\user'                    => 'panel' . DS . 'models' . DS . 'user.php',
   'kirby\\panel\\models\\user\\avatar'            => 'panel' . DS . 'models' . DS . 'user' . DS . 'avatar.php',
   'kirby\\panel\\models\\user\\history'           => 'panel' . DS . 'models' . DS . 'user' . DS . 'history.php',
+  'kirby\\panel\\models\\user\\permission'        => 'panel' . DS . 'models' . DS . 'user' . DS . 'permission.php',
 
   // collections
   'kirby\\panel\\collections\\users'              => 'panel' . DS . 'collections' . DS . 'users.php',
   'kirby\\panel\\collections\\files'              => 'panel' . DS . 'collections' . DS . 'files.php',
   'kirby\\panel\\collections\\children'           => 'panel' . DS . 'collections' . DS . 'children.php',
-  
+
 ), __DIR__ . DS . 'src');
 
 

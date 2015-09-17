@@ -1,4 +1,4 @@
-<?php 
+<?php
 
 return function($page) {
 
@@ -8,7 +8,7 @@ return function($page) {
   // center the submit button
   $form->centered = true;
 
-  // set the keep api    
+  // set the keep api
   $form->data('keep', $page->url('keep'));
 
   // remove the cancel button
@@ -42,6 +42,16 @@ return function($page) {
     }
 
   }
+
+  // disable form if permission is missing
+  if(!panel()->user()->hasPermission('panel.page.update', $page)) {
+    $form->buttons->submit = false;
+    foreach($form->fields() as $field) {
+        $field->readonly = true;
+        $field->disabled = true;
+    }
+  }
+
 
   return $form;
 

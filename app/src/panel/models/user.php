@@ -8,6 +8,7 @@ use Str;
 
 use Kirby\Panel\Models\User\Avatar;
 use Kirby\Panel\Models\User\History;
+use Kirby\Panel\Models\User\Permission;
 
 class User extends \User {
 
@@ -16,13 +17,13 @@ class User extends \User {
     return panel()->urls()->index() . '/users/' . $this->username() . '/' . $action;
   }
 
-  public function form($action, $callback) {    
+  public function form($action, $callback) {
     return panel()->form('users/' . $action, $this, $callback);
   }
 
   public function update($data = array()) {
 
-    if(!panel()->user()->isAdmin() and !$this->isCurrent()) {
+    if(!panel()->user()->hasPermission('panel.user.update') and !$this->isCurrent()) {
       throw new Exception('You are not allowed to update this user');
     }
 
@@ -54,13 +55,13 @@ class User extends \User {
         return true;
       }
     } else {
-      return false;       
+      return false;
     }
   }
 
   public function delete() {
 
-    if(!panel()->user()->isAdmin() and !$this->isCurrent()) {
+    if(!panel()->user()->hasPermission('panel.user.delete') and !$this->isCurrent()) {
       throw new Exception('You are not allowed to delete users');
     }
 
@@ -83,6 +84,11 @@ class User extends \User {
     return $this->is(panel()->user());
   }
 
+  public function hasPermission($permission, $page = null) {
+    $role = new Permission($this->role(), $page);
+    return $role->hasPermission($permission);
+  }
+
   public function history() {
     return new History($this);
   }
@@ -90,10 +96,10 @@ class User extends \User {
   public function topbar($topbar) {
 
     $topbar->append(purl('users'), l('users'));
-    $topbar->append($this->url(), $this->username());    
+    $topbar->append($this->url(), $this->username());
 
     // if($user === 'user') {
-    //   $topbar->append(purl('users/add'), l('users.index.add'));    
+    //   $topbar->append(purl('users/add'), l('users.index.add'));
     // }
 
   }

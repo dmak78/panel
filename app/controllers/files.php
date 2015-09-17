@@ -6,6 +6,7 @@ class FilesController extends Kirby\Panel\Controllers\Base {
 
     $page  = $this->page($id);
     $files = $page->files();
+    $user  = panel()->user();
 
     // don't create the view if the page is not allowed to have files
     if(!$page->canHaveFiles()) {
@@ -16,11 +17,14 @@ class FilesController extends Kirby\Panel\Controllers\Base {
     $this->sort($page);
 
     return $this->screen('files/index', $files, array(
-      'page'     => $page,
-      'files'    => $files,
-      'back'     => $page->url('edit'),
-      'sortable' => $page->canSortFiles(),
-      'uploader' => $this->snippet('uploader', array('url' => $page->url('upload')))
+      'page'      => $page,
+      'files'     => $files,
+      'back'      => $page->url('edit'),
+      'sortable'  => $page->canSortFiles(),
+      'canUpload' => $user->hasPermission('panel.file.upload', $page),
+      'uploader'  => $this->snippet('uploader', array('url' => $page->url('upload'))),
+      'canEdit'   => $user->hasPermission('panel.file.upload', $page),
+      'canDelete' => $user->hasPermission('panel.file.delete', $page),
     ));
 
   }
@@ -30,6 +34,7 @@ class FilesController extends Kirby\Panel\Controllers\Base {
     $self = $this;
     $page = $this->page($id);
     $file = $page->file(urldecode($filename));
+    $user = panel()->user();
 
     if(!$file) {
       throw new Exception(l('files.error.missing.file'));
@@ -55,14 +60,16 @@ class FilesController extends Kirby\Panel\Controllers\Base {
     });
 
     return $this->screen('files/edit', $file, array(
-      'form'     => $form,
-      'page'     => $page,
-      'file'     => $file,
-      'returnTo' => url::last() == $page->url('files') ? $page->url('files') : $page->url('edit'),
-      'uploader' => $this->snippet('uploader', array(
-        'url'      => $file->url('replace'), 
-        'accept'   => $file->mime(),
-        'multiple' => false
+      'form'       => $form,
+      'page'       => $page,
+      'file'       => $file,
+      'returnTo'   => url::last() == $page->url('files') ? $page->url('files') : $page->url('edit'),
+      'canReplace' => $user->hasPermission('panel.file.replace', $page),
+      'canDelete'  => $user->hasPermission('panel.file.delete', $page),
+      'uploader'   => $this->snippet('uploader', array(
+        'url'       => $file->url('replace'),
+        'accept'    => $file->mime(),
+        'multiple'  => false
       ))
     ));
 
@@ -72,8 +79,15 @@ class FilesController extends Kirby\Panel\Controllers\Base {
 
     $page = $this->page($id);
 
+    if(!panel()->user()->hasPermission('panel.file.upload', $page)) {
+      return $this->modal('error', array(
+        'headline' => 'Error',
+        'text'     => 'You are not allowed to upload a file',
+      ));
+    }
+
     try {
-      $page->upload();        
+      $page->upload();
       $this->notify(':)');
     } catch(Exception $e) {
       $this->alert($e->getMessage());
@@ -87,8 +101,15 @@ class FilesController extends Kirby\Panel\Controllers\Base {
 
     $file = $this->page($id)->file(urldecode($filename));
 
+    if(!panel()->user()->hasPermission('panel.file.replace', $this->page($id))) {
+      return $this->modal('error', array(
+        'headline' => 'Error',
+        'text'     => 'You are not allowed to replace this file',
+      ));
+    }
+
     try {
-      $file->replace();        
+      $file->replace();
       $this->notify(':)');
     } catch(Exception $e) {
       $this->alert($e->getMessage());
@@ -106,6 +127,15 @@ class FilesController extends Kirby\Panel\Controllers\Base {
 
     $self = $this;
     $page = $this->page($id);
+
+    if(!panel()->user()->hasPermission('panel.file.delete', $page)) {
+      return $this->modal('error', array(
+        'headline' => 'Error',
+        'text'     => 'You are not allowed to delete this file',
+      ));
+    }
+
+
     $file = $page->file(urldecode($filename));
     $form = $this->form('files/delete', $file, function($form) use($file, $page, $self) {
 

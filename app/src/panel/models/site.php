@@ -40,13 +40,13 @@ class Site extends \Site {
       return panel()->urls()->index() . '/options';
     } else if($action == 'preview') {
       return $this->url();
-    } else {    
+    } else {
       return panel()->urls()->index() . '/site/' . $action;
     }
 
   }
 
-  public function form($action, $callback) {    
+  public function form($action, $callback) {
     return panel()->form('pages/' . $action, $this, $callback);
   }
 
@@ -71,7 +71,7 @@ class Site extends \Site {
   }
 
   public function files() {
-    return new Files($this);    
+    return new Files($this);
   }
 
   public function children() {
@@ -81,12 +81,16 @@ class Site extends \Site {
   public function filterInput($input) {
     $data = array();
     foreach($this->content()->toArray() as $key => $value) {
-      $data[$key] = null;  
+      $data[$key] = null;
     }
     return array_merge($data, $input);
   }
 
   public function update($input = array()) {
+
+    if(!panel()->user()->hasPermission('panel.site.update', $this)) {
+      throw new Exception('You are not allowed to update the site options');
+    }
 
     $data = $this->filterInput($input);
 
@@ -99,11 +103,11 @@ class Site extends \Site {
   }
 
   public function sidebar() {
-    return new Sidebar($this);    
+    return new Sidebar($this);
   }
 
   public function upload() {
-    return new Uploader($this);        
+    return new Uploader($this);
   }
 
   public function addButton() {
@@ -121,9 +125,9 @@ class Site extends \Site {
     }
 
     if($topbar->view == 'subpages/index') {
-      $topbar->append($this->url('subpages'), l('subpages'));    
+      $topbar->append($this->url('subpages'), l('subpages'));
     }
-   
+
     $topbar->html .= new Snippet('languages');
 
   }

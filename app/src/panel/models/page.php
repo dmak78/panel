@@ -86,7 +86,7 @@ class Page extends \Page {
 
         return intval($to);
         break;
-    }    
+    }
 
   }
 
@@ -113,11 +113,11 @@ class Page extends \Page {
         return false;
       }
     } else {
-      return panel()->urls()->index() . '/pages/' . $this->id() .  '/' . $action;            
+      return panel()->urls()->index() . '/pages/' . $this->id() .  '/' . $action;
     }
   }
 
-  public function form($action, $callback) {    
+  public function form($action, $callback) {
     return panel()->form('pages/' . $action, $this, $callback);
   }
 
@@ -177,8 +177,8 @@ class Page extends \Page {
         // don't erase the url key
         continue;
       } else {
-        $data[$key] = null;  
-      }      
+        $data[$key] = null;
+      }
     }
 
     return array_merge($data, $input);
@@ -199,7 +199,7 @@ class Page extends \Page {
   public function maxFiles() {
     $max = $this->blueprint()->files()->max();
     // see: maxSubpages
-    return is_null($max) ? 2147483647 : $max;    
+    return is_null($max) ? 2147483647 : $max;
   }
 
   public function canHaveSubpages() {
@@ -207,7 +207,7 @@ class Page extends \Page {
   }
 
   public function canShowSubpages() {
-    return ($this->pages()->hide() !== true and $this->canHaveSubpages());    
+    return ($this->pages()->hide() !== true and $this->canHaveSubpages());
   }
 
   public function canHaveFiles() {
@@ -215,7 +215,7 @@ class Page extends \Page {
   }
 
   public function canShowFiles() {
-    return ($this->files()->hide() !== true and $this->canHaveFiles());    
+    return ($this->files()->hide() !== true and $this->canHaveFiles());
   }
 
   public function canHaveMoreSubpages() {
@@ -235,7 +235,7 @@ class Page extends \Page {
       return false;
     } else {
       return true;
-    }    
+    }
   }
 
   public function canChangeUrl() {
@@ -250,6 +250,10 @@ class Page extends \Page {
 
     if(!$this->canChangeUrl()) {
       throw new Exception('You cannot change the URL of this page');
+    }
+
+    if(!panel()->user()->hasPermission('panel.page.move', $this)) {
+      throw new Exception('You are not allowed to change the URL of this page');
     }
 
     $site    = panel()->site();
@@ -269,10 +273,14 @@ class Page extends \Page {
 
     // hit the hook
     kirby()->trigger('panel.page.move', $this);
-  
+
   }
 
   public function sort($to = null, $sibling = false) {
+
+    if(!panel()->user()->hasPermission('panel.subpages.sort', $this->parent())) {
+      throw new Exception('You are not allowed to sort these pages');
+    }
 
     if($this->isErrorPage()) {
       return $this->num();
@@ -287,7 +295,7 @@ class Page extends \Page {
     // clean the other page numbers
     if(!$sibling) {
 
-      $this->sortSiblings($num);      
+      $this->sortSiblings($num);
 
       // hit the hook
       kirby()->trigger('panel.page.sort', $this);
@@ -299,6 +307,11 @@ class Page extends \Page {
   }
 
   public function hide() {
+
+    if(!panel()->user()->hasPermission('panel.page.hide', $this)) {
+      throw new Exception('You are not allowed to change visibility of this page');
+    }
+
     parent::hide();
     $this->sortSiblings();
     kirby()->trigger('panel.page.hide', $this);
@@ -308,7 +321,7 @@ class Page extends \Page {
     if($this->isVisible()) {
       $this->hide();
     } else {
-      $this->sort($position);          
+      $this->sort($position);
     }
   }
 
@@ -336,7 +349,7 @@ class Page extends \Page {
     }
 
     if($exception) {
-      throw new Exception($error);      
+      throw new Exception($error);
     } else {
       return false;
     }
@@ -344,7 +357,7 @@ class Page extends \Page {
   }
 
   public function sidebar() {
-    return new Sidebar($this);    
+    return new Sidebar($this);
   }
 
   public function sortSiblings($skip = null) {
@@ -387,6 +400,10 @@ class Page extends \Page {
 
   public function update($input = array()) {
 
+    if(!panel()->user()->hasPermission('panel.page.update', $this)) {
+      throw new Exception('You are not allowed to update this page');
+    }
+
     $data = $this->filterInput($input);
 
     $this->changes()->discard();
@@ -401,10 +418,14 @@ class Page extends \Page {
   }
 
   public function upload() {
-    new Uploader($this);        
+    new Uploader($this);
   }
 
   public function delete($force = false) {
+
+    if(!panel()->user()->hasPermission('panel.page.delete', $this)) {
+      throw new Exception('You are not allowed to delete this page');
+    }
 
     // delete the page
     parent::delete();
@@ -461,9 +482,9 @@ class Page extends \Page {
     $topbar->append($this->url('edit'), $this->title());
 
     if($topbar->view == 'subpages/index') {
-      $topbar->append($this->url('subpages'), l('subpages'));    
+      $topbar->append($this->url('subpages'), l('subpages'));
     }
-   
+
     $topbar->html .= new Snippet('languages');
 
   }

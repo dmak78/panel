@@ -1,4 +1,4 @@
-<?php 
+<?php
 
 return function($file) {
 
@@ -9,7 +9,7 @@ return function($file) {
   $info[] = $file->niceSize();
 
   if((string)$file->dimensions() != '0 x 0') {
-    $info[] = $file->dimensions();      
+    $info[] = $file->dimensions();
   }
 
   // setup the default fields
@@ -17,7 +17,7 @@ return function($file) {
     '_name' => array(
       'label'     => 'files.show.name.label',
       'type'      => 'filename',
-      'extension' => $file->extension(), 
+      'extension' => $file->extension(),
       'required'  => true,
       'default'   => $file->name(),
     ),
@@ -41,6 +41,15 @@ return function($file) {
 
   $form->centered = true;
   $form->buttons->cancel = '';
+
+  // disable form if permission is missing
+  if(!panel()->user()->hasPermission('panel.file.update', $file->page())) {
+    $form->buttons->submit = false;
+    foreach($form->fields() as $field) {
+        $field->readonly = true;
+        $field->disabled = true;
+    }
+  }
 
   return $form;
 

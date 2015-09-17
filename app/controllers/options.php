@@ -8,7 +8,7 @@ class OptionsController extends Kirby\Panel\Controllers\Base {
     $site    = panel()->site();
     $sidebar = $site->sidebar();
     $form    = $site->form('edit', function($form) use($site, $self) {
-      
+
       // validate all fields
       $form->validate();
 
@@ -26,6 +26,10 @@ class OptionsController extends Kirby\Panel\Controllers\Base {
       }
 
     });
+
+    if (!panel()->user()->hasPermission('panel.site.update', $site)) {
+      $this->redirect();
+    }
 
     return $this->screen('options/index', $site, array(
       'site'     => $site,

@@ -1,4 +1,4 @@
-<?php 
+<?php
 
 namespace Kirby\Panel\Models\Page;
 
@@ -13,6 +13,7 @@ class Sidebar {
   public function __construct($page) {
     $this->page      = $page;
     $this->blueprint = $page->blueprint();
+    $this->user      = panel()->user();
   }
 
   public function subpages() {
@@ -36,7 +37,9 @@ class Sidebar {
       'title'      => l('pages.show.subpages.title'),
       'page'       => $this->page,
       'subpages'   => $children,
-      'addbutton'  => $this->page->addButton(),
+      'addbutton'  => $this->user ->hasPermission('panel.subpages.create', $this->page) ?
+                      $this->page->addButton() : false,
+      'canEdit'    => $this->user ->hasPermission('panel.subpages.modify', $this->page),
       'pagination' => $pagination,
     ));
 
@@ -49,8 +52,10 @@ class Sidebar {
     }
 
     return new Snippet('pages/sidebar/files', array(
-      'page'  => $this->page,
-      'files' => $this->page->files(),
+      'page'      => $this->page,
+      'files'     => $this->page->files(),
+      'canEdit'   => $this->user ->hasPermission('panel.file.modify', $this->page),
+      'canUpload' => $this->user ->hasPermission('panel.file.upload', $this->page),
     ));
 
   }

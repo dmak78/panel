@@ -5,6 +5,7 @@ class SubpagesController extends Kirby\Panel\Controllers\Base {
   public function index($id) {
 
     $page = $this->page($id);
+    $user = panel()->user();
 
     // don't create the view if the page is not allowed to have subpages
     if(!$page->canHaveSubpages()) {
@@ -16,15 +17,19 @@ class SubpagesController extends Kirby\Panel\Controllers\Base {
     $invisible = $this->invisible($page);
 
     // activate the sorting
-    $this->sort($page);      
+    $this->sort($page);
 
     return $this->screen('subpages/index', $page, array(
-      'page'      => $page,
-      'addbutton' => $page->addbutton(),
-      'sortable'  => $page->blueprint()->pages()->sortable(),
-      'flip'      => $page->blueprint()->pages()->sort() == 'flip',
-      'visible'   => $visible,
-      'invisible' => $invisible,
+      'page'          => $page,
+      'addbutton'    => $user->hasPermission('panel.subpages.create', $page) ?
+                        $page->addbutton(): false,
+      'sortable'     => $user->hasPermission('panel.subpages.sort', $page) and
+                        $page->blueprint()->pages()->sortable(),
+      'flip'         => $page->blueprint()->pages()->sort() == 'flip',
+      'visible'      => $visible,
+      'invisible'    => $invisible,
+      'visibleBtn'   => $this->pagePermissions($visible),
+      'invisibleBtn' => $this->pagePermissions($invisible),
     ));
 
   }
@@ -39,10 +44,10 @@ class SubpagesController extends Kirby\Panel\Controllers\Base {
     ));
 
     return new Obj(array(
-      'pages'      => $pages, 
+      'pages'      => $pages,
       'pagination' => $pagination,
       'start'      => $pages->pagination()->numStart(),
-      'total'      => $pages->pagination()->items(),       
+      'total'      => $pages->pagination()->items(),
       'firstPage'  => $pages->pagination()->firstPageUrl(),
     ));
 
@@ -54,6 +59,17 @@ class SubpagesController extends Kirby\Panel\Controllers\Base {
 
   protected function invisible($page) {
     return $this->subpages($page, 'invisible');
+  }
+
+  protected function pagePermissions($subpages){
+    $return = array();
+    foreach($subpages->pages() as $key => $subpage) {
+      $return[$key] = array(
+        'canEdit'   => panel()->user()->hasPermission('panel.page.modify', $subpage),
+        'canDelete' => panel()->user()->hasPermission('panel.page.delete', $subpage),
+      );
+    }
+    return $return;
   }
 
   protected function sort($page) {
@@ -68,7 +84,7 @@ class SubpagesController extends Kirby\Panel\Controllers\Base {
           try {
             $subpage->sort(get('to'));
           } catch(Exception $e) {
-            // no error handling, because if sorting 
+            // no error handling, because if sorting
             // breaks, the refresh will fix it.
           }
           break;
@@ -76,7 +92,7 @@ class SubpagesController extends Kirby\Panel\Controllers\Base {
           try {
             $subpage->hide();
           } catch(Exception $e) {
-            // no error handling, because if sorting 
+            // no error handling, because if sorting
             // breaks, the refresh will fix it.
           }
           break;

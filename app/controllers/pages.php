@@ -6,15 +6,23 @@ class PagesController extends Kirby\Panel\Controllers\Base {
 
     $self   = $this;
     $parent = $this->page($id);
+
+    if(!panel()->user()->hasPermission('panel.subpages.create', $parent)) {
+      return $this->modal('error', array(
+        'headline' => 'Error',
+        'text'     => 'You are not allowed to create a page',
+      ));
+    }
+
     $form   = $parent->form('add', function($form) use($parent, $self) {
-    
+
       $form->validate();
 
       if(!$form->isValid()) {
         return $form->alert(l('pages.add.error.template'));
-      } 
+      }
 
-      try {        
+      try {
         $data = $form->serialize();
         $page = $parent->children()->create($data['uid'], $data['template'], array(
           'title' => $data['title']
@@ -35,7 +43,7 @@ class PagesController extends Kirby\Panel\Controllers\Base {
     $self = $this;
     $page = $this->page($id);
     $form = $page->form('edit', function($form) use($page, $self) {
-      
+
       // validate all fields
       $form->validate();
 
@@ -68,6 +76,13 @@ class PagesController extends Kirby\Panel\Controllers\Base {
     $self = $this;
     $page = $this->page($id);
 
+    if(!panel()->user()->hasPermission('panel.page.delete', $page)) {
+      return $this->modal('error', array(
+        'headline' => 'Error',
+        'text'     => 'You are not allowed to delete this page',
+      ));
+    }
+
     try {
       $page->isDeletable(true);
     } catch(Exception $e) {
@@ -75,7 +90,7 @@ class PagesController extends Kirby\Panel\Controllers\Base {
         'headline' => l($e->getMessage() . '.headline'),
         'text'     => l($e->getMessage() . '.text'),
         'back'     => $page->url()
-      ));      
+      ));
     }
 
     $form = $page->form('delete', function($form) use($page, $self) {
@@ -113,13 +128,20 @@ class PagesController extends Kirby\Panel\Controllers\Base {
       return $this->modal('error', array(
         'headline' => 'Error',
         'text'     => 'The URL for the home and error pages cannot be changed',
-      ));      
+      ));
+    }
+
+    if(!panel()->user()->hasPermission('panel.page.move', $page)) {
+      return $this->modal('error', array(
+        'headline' => 'Error',
+        'text'     => 'You are not allowed to change the URL of this page',
+      ));
     }
 
     $form = $page->form('url', function($form) use($page, $self) {
 
       try {
-        $page->move(get('uid'));              
+        $page->move(get('uid'));
         $self->notify(':)');
         $self->redirect($page);
       } catch(Exception $e) {
@@ -142,6 +164,13 @@ class PagesController extends Kirby\Panel\Controllers\Base {
       return $this->modal('error', array(
         'headline' => 'Error',
         'text'     => 'The status of the error page cannot be changed',
+      ));
+    }
+
+    if(!panel()->user()->hasPermission('panel.page.hide', $page)) {
+      return $this->modal('error', array(
+        'headline' => 'Error',
+        'text'     => 'You are not allowed to change the status of this page',
       ));
     }
 

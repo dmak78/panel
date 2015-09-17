@@ -1,4 +1,4 @@
-<?php 
+<?php
 
 namespace Kirby\Panel\Models\File;
 
@@ -29,7 +29,7 @@ class Menu {
 
   }
 
-  public function previewOption() {  
+  public function previewOption() {
     return $this->item('play-circle-o', 'files.show.open', array(
       'href'   => $this->file->url('preview'),
       'target' => '_blank'
@@ -56,8 +56,12 @@ class Menu {
     $list->addClass('dropdown-list');
 
     $list->append($this->previewOption());
-    $list->append($this->editOption());
-    $list->append($this->deleteOption());
+    if(panel()->user()->hasPermission('panel.file.modify', $this->page)) {
+      $list->append($this->editOption());
+    }
+    if(panel()->user()->hasPermission('panel.file.delete', $this->page)) {
+      $list->append($this->deleteOption());
+    }
 
     return '<nav class="dropdown dropdown-dark contextmenu">' . $list . '</nav>';
 

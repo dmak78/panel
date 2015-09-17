@@ -7,24 +7,26 @@ class UsersController extends Kirby\Panel\Controllers\Base {
   public function index() {
 
     $users = panel()->users();
-    $admin = panel()->user()->isAdmin();
+    $user  = panel()->user();
 
     return $this->screen('users/index', $users, array(
-      'users'  => $users,
-      'admin'  => $admin,
+      'users'     => $users,
+      'canAdd'    => $user->hasPermission('panel.user.add'),
+      'canEdit'   => $user->hasPermission('panel.user.edit'),
+      'canDelete' => $user->hasPermission('panel.user.delete'),
     ));
 
   }
 
   public function add() {
 
-    if(!panel()->user()->isAdmin()) {
+    if(!panel()->user()->hasPermission('panel.user.add')) {
       $this->redirect('users');
     }
 
     $self = $this;
     $form = $this->form('users/user', null, function($form) use($self) {
-      
+
       $form->validate();
 
       if(!$form->isValid()) {
@@ -57,12 +59,12 @@ class UsersController extends Kirby\Panel\Controllers\Base {
     $self = $this;
     $user = $this->user($username);
 
-    if(!panel()->user()->isAdmin() and !$user->isCurrent()) {
+    if(!panel()->user()->hasPermission('panel.user.edit') and !$user->isCurrent()) {
       $this->redirect('users');
     }
 
     $form = $user->form('user', function($form) use($user, $self) {
-      
+
       $form->validate();
 
       if(!$form->isValid()) {
@@ -78,7 +80,7 @@ class UsersController extends Kirby\Panel\Controllers\Base {
       } catch(Exception $e) {
         $self->alert($e->getMessage());
       }
-        
+
     });
 
     return $this->screen('users/edit', $user, array(
@@ -99,10 +101,10 @@ class UsersController extends Kirby\Panel\Controllers\Base {
     $user = $this->user($username);
     $self = $this;
 
-    if(!panel()->user()->isAdmin() and !$user->isCurrent()) {
+    if(!panel()->user()->hasPermission('panel.user.delete') and !$user->isCurrent()) {
       return $this->modal('error', array(
         'headline' => 'Error',
-        'text'     => 'You are not allowed to delete this user', 
+        'text'     => 'You are not allowed to delete this user',
         'back'     => purl('users')
       ));
     } else {

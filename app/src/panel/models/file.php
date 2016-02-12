@@ -77,6 +77,11 @@ class File extends \File {
     return in_array($this->mime(), $images);
   }
 
+  public function isWebVideo() {
+    $videos = array('video/mp4');
+    return in_array($this->mime(), $videos);
+  }
+
   public function canHaveThumb() {
     if(!$this->isWebImage()) {
       return false;

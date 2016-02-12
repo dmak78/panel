@@ -6,6 +6,20 @@ class SubpagesController extends Kirby\Panel\Controllers\Base {
 
     $page = $this->page($id);
 
+    $view = 'subpages/index';
+
+    switch($page->template()) {
+      case 'program':
+        $view = 'subpages/custom/program';
+        break;
+      case 'ambient':
+        $view = 'subpages/custom/ambients';
+        break;
+      case 'welcomes':
+        $view = 'subpages/custom/welcomes';
+        break;
+    }
+
     // don't create the view if the page is not allowed to have subpages
     if(!$page->canHaveSubpages()) {
       throw new Exception(l('subpages.add.error'));
@@ -18,13 +32,14 @@ class SubpagesController extends Kirby\Panel\Controllers\Base {
     // activate the sorting
     $this->sort($page);      
 
-    return $this->screen('subpages/index', $page, array(
+    return $this->screen($view, $page, array(
       'page'      => $page,
       'addbutton' => $page->addbutton(),
       'sortable'  => $page->blueprint()->pages()->sortable(),
       'flip'      => $page->blueprint()->pages()->sort() == 'flip',
       'visible'   => $visible,
       'invisible' => $invisible,
+      'template' => $page->template(),
     ));
 
   }
@@ -67,6 +82,14 @@ class SubpagesController extends Kirby\Panel\Controllers\Base {
         case 'sort':
           try {
             $subpage->sort(get('to'));
+          } catch(Exception $e) {
+            // no error handling, because if sorting 
+            // breaks, the refresh will fix it.
+          }
+          break;
+        case 'toggle':
+          try {
+            $subpage->toggle('last');
           } catch(Exception $e) {
             // no error handling, because if sorting 
             // breaks, the refresh will fix it.

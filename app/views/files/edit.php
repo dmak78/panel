@@ -23,6 +23,10 @@
       <object data="<?php __($file->url('preview')) ?>"></object>
       <?php elseif($file->canHavePreview()): ?>
       <img src="<?php __($file->url('preview')) ?>" alt="<?php __($file->filename()) ?>">
+      <?php elseif($file->isWebVideo()): ?>
+      <video controls preload width="640">
+        <source src="<?php __($file->url()) ?>" type="video/mp4"></source>
+      </video>
       <?php else: ?>
       <span>
         <strong><?php __($file->filename()) ?></strong>

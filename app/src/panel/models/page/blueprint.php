@@ -26,6 +26,7 @@ class Blueprint extends Obj {
   public $pages     = null;
   public $files     = null;
   public $hide      = false;
+  public $show_sidebar   = true;
   public $deletable = true;
   public $icon      = 'file-o';
   public $fields    = array();
@@ -40,6 +41,7 @@ class Blueprint extends Obj {
     $this->deletable = a::get($this->yaml, 'deletable', true);
     $this->icon      = a::get($this->yaml, 'icon', 'file-o');
     $this->hide      = a::get($this->yaml, 'hide', false);
+    $this->show_sidebar      = a::get($this->yaml, 'sidebar', true);
     $this->type      = a::get($this->yaml, 'type', 'page');
     $this->pages     = new Pages(a::get($this->yaml, 'pages', true));
     $this->files     = new Files(a::get($this->yaml, 'files', true));

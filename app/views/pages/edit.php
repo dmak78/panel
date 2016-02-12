@@ -1,6 +1,8 @@
-<div class="bars bars-with-sidebar-left cf">
+<div class="bars cf <?php e($page->blueprint()->show_sidebar(), ' bars-with-sidebar-left'); ?>">
 
+  <?php if($page->blueprint()->show_sidebar()): ?>
   <?php echo $sidebar ?>
+  <?php endif ?>
 
   <div class="mainbar">
     <div class="section">

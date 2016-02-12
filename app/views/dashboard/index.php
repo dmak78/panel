@@ -1,5 +1,21 @@
-<div class="section">
 
+
+<div class="big-header">
+  <h1>The Giving Stream</h1>
+</div>
+
+<div class="section">
+  <div class="dashboard-links">
+    <a href="/panel/pages/welcome/subpages">
+      <img src="/assets/images/sections/welcome.png" />
+    </a>
+    <a href="/panel/pages/ambient/subpages">
+      <img src="/assets/images/sections/ambient.png" />
+    </a>
+    <a href="/panel/pages/active/subpages">
+      <img src="/assets/images/sections/active.png" />
+    </a>
+  </div>
   <div class="dashboard">
 
     <?php foreach($widgets as $id => $widget): ?>

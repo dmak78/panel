@@ -226,7 +226,9 @@ h6 a {
 
 * {
   font-size: 100%;
-  font-family: "Source Sans Pro", "Apple LiGothic Medium", "Microsoft JhengHei UI", "Helvetica Neue", Arial, sans-serif; }
+  /*font-family: Source Sans Pro", "Apple LiGothic Medium", "Microsoft JhengHei UI", "Helvetica Neue", Arial, sans-serif; */
+  font-family: "Dual", "Source Sans Pro", "Apple LiGothic Medium", "Microsoft JhengHei UI", "Helvetica Neue", Arial, sans-serif; 
+}
 
 .light {
   font-weight: 300; }
@@ -428,12 +430,15 @@ form.loading:after {
 
 /* Label */
 .label {
+  text-transform: uppercase;
   position: relative;
-  font-size: 1em;
+  font-size: 12px;
   font-weight: 600;
   display: block;
-  line-height: 1.5em;
-  padding-bottom: .5em; }
+  line-height: 14px;
+  padding-bottom: .7em;
+  letter-spacing: 1px;
+  color: rgba(0,0,0,0.6); }
 
 .label abbr {
   color: #8dae28;
@@ -673,8 +678,10 @@ body.rtl .field-grid {
 /* Inputs */
 .input {
   padding: .5em;
-  font-size: 1em;
-  line-height: 1.5em;
+  /*font-size: 1em;
+  line-height: 1.5em;*/
+  font-size: 16px;
+  line-height: 19px;
   font-weight: 400;
   border: 2px solid #ddd;
   background: #fff;
@@ -684,8 +691,8 @@ body.rtl .field-grid {
   -moz-appearance: none;
   -ms-appearance: none;
   appearance: none;
-  border-radius: 0;
-  min-height: 2.75em; }
+/*  border-radius: 0;
+  min-height: 2.75em;*/ }
 
 .input:-webkit-autofill {
   box-shadow: 0 0 0 1000px white inset !important; }
@@ -852,9 +859,25 @@ body.ltr .buttons .btn-cancel {
 body.rtl .buttons .btn-cancel {
   float: right; }
 
-body.ltr .buttons .btn-submit {
+body.ltr .buttons .btn-submit,body.ltr .buttons .btn-cancel {
   float: right;
-  margin-left: 1rem; }
+  margin-left: 1rem;
+  width: 260px;
+  background-color: #f8ed3f;
+  height: 70px;
+  border: none !important;
+  text-transform: uppercase;
+  line-height: 70px;
+  padding-top: 0;
+  padding-bottom: 0; 
+  text-align: center;}
+
+body.ltr .buttons .btn-cancel {
+  background-color: black;
+  color: white;
+  border-radius: 8px;
+}
+
 
 body.rtl .buttons .btn-submit {
   float: left;
@@ -884,6 +907,20 @@ body.rtl .buttons .btn-submit {
 /* Special fields */
 #form-field-username {
   text-transform: lowercase; }
+
+#form-field-title {
+  font-size: 24px;
+  line-height: 34px;
+  padding-top: 0.6em;
+  padding-bottom: 0.5em;
+}
+
+label[for='form-field-title']{
+  font-size: 18px;
+  line-height: 22px;
+  padding-bottom: 20px;
+  color: rgba(0,0,0,1);
+}
 
 @media screen and (min-width: 50em) {
   .mainbar .form {
@@ -1557,7 +1594,8 @@ body.rtl .icon-right {
   padding-bottom: .5em;
   margin-bottom: .5em;
   font-weight: 600;
-  font-size: 1em; }
+  font-size: 1em;
+  text-transform: uppercase; }
 
 .hgroup-options {
   display: block;
